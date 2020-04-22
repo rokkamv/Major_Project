@@ -25,16 +25,24 @@ batchInstance = pd.read_csv('batch_instance.csv', names=colInstance, header=None
 
 #print(batchInstance.groupby('task_id')['real_cpu_max'].max())
 
-print(batchInstance.groupby(
+instanceTable = batchInstance.groupby(
    ('task_id')
 ).agg(
     {
-         'real_cpu_max': [min, max, sum],    # Sum duration per group
-         'real_cpu_avg': [min, max, sum],  # get the count of networks
+         'real_cpu_max': [min, max, sum],
+         'real_cpu_avg': [min, max, sum],
     }
-))
+)
+print(instanceTable)
 
 #print(batchInstance.groupby('task_id')['real_mem_max'].max())
+
+print(batchTask['task_id'])
+
+result = pd.merge(instanceTable,
+                 batchTask[['task_id', 'plan_cpu', 'plan_mem']],
+                 on='task_id')
+print(result.head())
 
 
 
