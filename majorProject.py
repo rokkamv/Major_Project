@@ -6,7 +6,7 @@ Created on Wed Apr 22 00:12:25 2020
 """
 
 import pandas as pd
-
+import matplotlib.pyplot as plt
 
 
 colTask = ['create_timestamp', 'modify_timestamp', 'job_id', 'task_id', 'instance_num', 'status', 
@@ -52,4 +52,7 @@ result = pd.merge(instanceTable,
                  on='task_id')
 print(result.head())
 
+plt.xlabel('CPU DEMAND')
+plt.ylabel('MAX CPU USED')
+plt.plot(result['plan_cpu'], result['real_cpu_max'])
 
