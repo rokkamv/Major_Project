@@ -1,13 +1,13 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[1]:
+# In[2]:
 
 
 import pandas as pd
 
 
-# In[5]:
+# In[23]:
 
 
 colTask = ['create_timestamp', 'modify_timestamp', 'job_id', 'task_id', 'instance_num', 'status', 
@@ -25,9 +25,11 @@ batchInstance = pd.read_csv('batch_instance.csv', names=colInstance, header=None
 # print(batchInstance['task_id'].value_counts())
 
 #print(batchInstance.groupby('task_id')['real_cpu_max'].max())
+print(batchInstance)
+print(batchTask)
 
 
-# In[70]:
+# In[4]:
 
 
 print(batchInstance.groupby(
@@ -42,7 +44,7 @@ print(batchInstance.groupby(
 #print(batchInstance.groupby('task_id')['real_mem_max'].max())
 
 
-# In[22]:
+# In[5]:
 
 
 instanceTable = batchInstance.groupby(
@@ -58,7 +60,7 @@ print(instanceTable.head())
 # print(batchTask['task_id'])
 
 
-# In[23]:
+# In[6]:
 
 
 merge_task_instance = pd.merge(instanceTable,
@@ -67,7 +69,7 @@ merge_task_instance = pd.merge(instanceTable,
 print(merge_task_instance.head())
 
 
-# In[44]:
+# In[7]:
 
 
 #Grouped by plan_cpu and the maximum of real_cpu_max among all the task_ids
@@ -77,7 +79,7 @@ result= merge_task_instance.groupby(['plan_cpu'],as_index=False).max()
 result
 
 
-# In[74]:
+# In[87]:
 
 
 import matplotlib.pyplot as plt
@@ -98,5 +100,56 @@ plt.yticks(fontsize=10)
 
 plt.title("plan_cpu vs real_cpu_max",fontsize=25)
 
-plt.show() 
+plt.show()
+
+
+# In[113]:
+
+
+plt.figure(figsize=(50,75))
+
+timeVsplanCpu_ofTask=batchTask.groupby(['create_timestamp'],as_index=False).sum()
+
+#removing negative values
+timeVsplanCpu_ofTask=timeVsplanCpu_ofTask[timeVsplanCpu_ofTask.create_timestamp>=0] 
+x=timeVsplanCpu_ofTask['create_timestamp']
+y=timeVsplanCpu_ofTask['plan_cpu']
+plt.subplot(311)
+plt.xlabel('Time in seconds',fontsize=50)
+plt.ylabel('Total Requested CPU',fontsize=50)
+# plt.xticks(index,x,fontsize=10,rotation=30)
+plt.yticks(fontsize=40)
+plt.xticks(fontsize=40)
+plt.title("Total requested CPU vs (Time>=0)",fontsize=60)
+plt.plot(x,y)
+
+#removing plan_cpu values>4000
+timeVsplanCpu_ofTask=timeVsplanCpu_ofTask[timeVsplanCpu_ofTask.plan_cpu<=4000]
+x=timeVsplanCpu_ofTask['create_timestamp']
+y=timeVsplanCpu_ofTask['plan_cpu']
+plt.subplot(312)
+plt.xlabel('Time in seconds',fontsize=50)
+plt.ylabel('Total Requested CPU',fontsize=50)
+# plt.xticks(index,x,fontsize=10,rotation=30)
+plt.yticks(fontsize=40)
+plt.xticks(fontsize=40)
+plt.title("(Total requested CPU<=4000) vs (Time>=0)",fontsize=60)
+plt.plot(x,y)
+
+#removing plan_cpu values==0
+timeVsplanCpu_ofTask=timeVsplanCpu_ofTask[timeVsplanCpu_ofTask.plan_cpu>0]
+# print(timeVsplanCpu_ofTask)
+x=timeVsplanCpu_ofTask['create_timestamp']
+y=timeVsplanCpu_ofTask['plan_cpu']
+plt.subplot(313)
+plt.axis([0,2000,0,2500])
+plt.xlabel('Time in seconds',fontsize=50)
+plt.ylabel('Total Requested CPU',fontsize=50)
+# plt.xticks(index,x,fontsize=10,rotation=30)
+plt.yticks(fontsize=40)
+plt.xticks(fontsize=40)
+plt.title("Total requested CPU(>0 and <=2500) vs Time(0-2000)",fontsize=60)
+plt.plot(x,y)
+
+plt.show()
 
